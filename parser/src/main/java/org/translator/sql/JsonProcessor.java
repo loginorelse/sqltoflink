@@ -1,3 +1,5 @@
+package org.translator.sql;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.translator.sql.entities.Program;
 
