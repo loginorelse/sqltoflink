@@ -6,13 +6,14 @@ import org.translator.sql.entities.Definition;
 import org.translator.sql.entities.Program;
 import org.translator.sql.entities.Statement;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Util {
+    private static ObjectMapper mapper = new ObjectMapper();
+
     @SneakyThrows
-    public static void createPrintTemplateJson() {
+    public static String createClusterParamsJson() {
         List<Statement> statements = new ArrayList<>();
 
         List<Definition> clusterParams = new ArrayList<>() {{
@@ -28,6 +29,11 @@ public class Util {
 
         statements.add(new Statement(clusterParams));
 
+        return mapper.writeValueAsString(new Program(statements));
+    }
+
+    @SneakyThrows
+    public static String createDDLJson() {
         Definition sql0 = new Definition(
                 "operation",
                 """
@@ -43,7 +49,7 @@ public class Util {
                         'csv.allow-comments' = 'true',
                         'path' = 'path-to-csv'
                         )
-                        """);
+                        """.replaceAll("\\n", ""));
 
         List<Definition> sql0Definitions = new ArrayList<>() {{
             add(new Definition("category", "SQL"));
@@ -52,8 +58,10 @@ public class Util {
             add(sql0);
         }};
 
-        statements.add(new Statement(sql0Definitions));
-
+        return mapper.writeValueAsString(new Program(new ArrayList<>() {{ add(new Statement(sql0Definitions)); }}));
+    }
+    @SneakyThrows
+    public static String createInsertIntoJson() {
         Definition sql1 = new Definition(
                 "operation",
                 """
@@ -64,7 +72,7 @@ public class Util {
                         ('4', 'Sherlock Holmes', 812.3, 197, 'books'),
                         ('5', '8 Mile', 954.0, 53, 'DVD'),
                         ('6', 'The big Bang theory', 799.0, 584, 'DVD');
-                        """);
+                        """.replaceAll("\\n", ""));
 
         List<Definition> sql1Definitions = new ArrayList<>() {{
             add(new Definition("category", "SQL"));
@@ -73,27 +81,36 @@ public class Util {
             add(sql1);
         }};
 
-        statements.add(new Statement(sql1Definitions));
+        return mapper.writeValueAsString(new Program(new ArrayList<>() {{ add(new Statement(sql1Definitions)); }}));
+    }
 
-        Definition sql2 = new Definition(
-                "operation",
-                """
-                        SELECT product_name, price, product_category
-                        FROM (
-                          SELECT *,
-                          ROW_NUMBER() OVER (PARTITION BY product_category ORDER BY sales DESC) AS row_num
-                          FROM src)
-                        WHERE row_num <= 2""");
+    @SneakyThrows
+    public static String createReadJson() {
+        return mapper.writeValueAsString(
+                new Program(new ArrayList<>() {{
+                    add(new Statement(
+                            new ArrayList<>() {{
+                                add(new Definition("category", "SQL"));
+                                add(new Definition("type", "select"));
+                                add(new Definition("name", "topN"));
+                                add(new Definition(
+                                        "operation",
+                                        """
+                                                SELECT product_name, price, product_category
+                                                FROM (
+                                                  SELECT *,
+                                                  ROW_NUMBER() OVER (PARTITION BY product_category ORDER BY sales DESC) AS row_num
+                                                  FROM src)
+                                                WHERE row_num <= 2"""
+                                                .replaceAll("\\n|\\s\\s", "")));
+                            }}
+                    ));
+                }})
+        );
+    }
 
-        List<Definition> sql2Definitions = new ArrayList<>() {{
-            add(new Definition("category", "SQL"));
-            add(new Definition("type", "select"));
-            add(new Definition("name", "topN"));
-            add(sql2);
-        }};
-
-        statements.add(new Statement(sql2Definitions));
-
+    @SneakyThrows
+    public static String createDataStreamJson() {
         List<Definition> ds0 = new ArrayList<>() {{
             add(new Definition("category", "data_stream"));
             add(new Definition("type", "filter"));
@@ -102,12 +119,8 @@ public class Util {
             add(new Definition("from", "topN"));
         }};
 
-        statements.add(new Statement(ds0));
+        Program program = new Program(new ArrayList<>() {{ add(new Statement(ds0)); }});
 
-        Program program = new Program(statements);
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.writeValue(new File("path"), program);
+        return mapper.writeValueAsString(program);
     }
 }
