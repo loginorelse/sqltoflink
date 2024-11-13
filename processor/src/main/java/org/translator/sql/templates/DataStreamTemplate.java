@@ -1,5 +1,6 @@
 package org.translator.sql.templates;
 
+import lombok.Getter;
 import org.translator.sql.entities.Definition;
 
 import java.util.Arrays;
@@ -7,6 +8,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Queue;
 
+@Getter
 public class DataStreamTemplate extends OperatorTemplate {
     public enum DataStreamOperatorType {
         FILTER, CREATE_TABLE, PRINT, READ_SOURCE, SINK;

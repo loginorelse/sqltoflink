@@ -3,33 +3,25 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.translator.sql</groupId>
+        <artifactId>sqltoflink</artifactId>
+        <version>1.0</version>
+    </parent>
 
-    <groupId>org.translator.sql</groupId>
-    <artifactId>sqltoflink</artifactId>
-    <version>1.0</version>
-
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>parser</module>
-        <module>processor</module>
-    </modules>
+    <artifactId>processor</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.34</lombok.version>
-        <jackson.vesion>2.18.1</jackson.vesion>
-        <junit.version>5.11.3</junit.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
+            <groupId>org.translator.sql</groupId>
+            <artifactId>parser</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 </project>
